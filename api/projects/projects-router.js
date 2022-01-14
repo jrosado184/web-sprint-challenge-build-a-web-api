@@ -68,7 +68,16 @@ router.delete("/:id", async (req, res) => {
     }
   } catch (error) {}
 });
-router.get("/", (req, res) => {});
+router.get("/:id/actions", async (req, res) => {
+  try {
+    const action = await Projects.get(req.params.id);
+    if (!action) {
+      res.status(404).json({ message: "id does not exist" });
+    } else {
+      res.json(action);
+    }
+  } catch {}
+});
 router.get("/", (req, res) => {});
 router.get("/", (req, res) => {});
 router.post("/", (req, res) => {});
