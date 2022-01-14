@@ -25,4 +25,19 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.post("/", (req, res) => {
+  const { name, description } = req.body;
+  if (!name || !description) {
+    res.status(400).json({ message: "fill out all required fields" });
+  } else {
+    Projects.insert(req.body)
+      .then((project) => {
+        res.json(project);
+      })
+      .catch((error) => {
+        res.json(error.message);
+      });
+  }
+});
+
 module.exports = router;
