@@ -1,6 +1,6 @@
 // Write your "projects" router here!
 const Projects = require("./projects-model");
-const { validateById } = require("./projects-middleware");
+const { validateById, validateBody } = require("./projects-middleware");
 const express = require("express");
 const router = express.Router();
 
@@ -22,30 +22,20 @@ router.get("/:id", validateById, async (req, res, next) => {
   }
 });
 
-router.post("/", (req, res, next) => {
-  const { name, description } = req.body;
-  if (!name || !description) {
-    res.status(400).json({ message: "fill out all required fields" });
-  } else {
-    Projects.insert(req.body)
-      .then((project) => {
-        res.json(project);
-      })
-      .catch((error) => {
-        next(error);
-      });
-  }
+router.post("/", validateBody, (req, res, next) => {
+  Projects.insert(req.body)
+    .then((project) => {
+      res.json(project);
+    })
+    .catch((error) => {
+      next(error);
+    });
 });
 
-router.put("/:id", validateById, async (req, res, next) => {
+router.put("/:id", validateById, validateBody, async (req, res, next) => {
   try {
-    const { name, description } = req.body;
     const update = await Projects.update(req.params.id, req.body);
-    if (!name || !description) {
-      res.status(400).json({ message: "fill out all required fields" });
-    } else {
-      res.json(update);
-    }
+    res.json(update);
   } catch (error) {
     next(error);
   }

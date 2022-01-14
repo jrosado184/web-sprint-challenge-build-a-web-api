@@ -16,6 +16,17 @@ async function validateById(req, res, next) {
   }
 }
 
+async function validateBody(req, res, next) {
+  const { name, description } = req.body;
+  if (!name || !description) {
+    return res
+      .status(400)
+      .json({ message: "please fill in the required fields!" });
+  }
+  next();
+}
+
 module.exports = {
   validateById,
+  validateBody,
 };
