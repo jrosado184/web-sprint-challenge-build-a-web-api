@@ -26,8 +26,18 @@ router.post("/", validateBody, (req, res, next) => {
     })
     .catch(next);
 });
-router.put("/", (req, res) => {});
-router.delete("/", (req, res) => {});
+router.put("/:id", validateById, validateBody, (req, res, next) => {
+  Action.update(req.params.id, req.body)
+    .then((action) => {
+      res.json(action);
+    })
+    .catch(next);
+});
+router.delete("/:id", validateById, (req, res) => {
+  Action.remove(req.params.id).then((action) => {
+    res.json(action);
+  });
+});
 
 router.use((err, req, res, next) => {
   res.status(err.status || 500).json({

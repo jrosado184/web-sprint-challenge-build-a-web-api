@@ -21,10 +21,12 @@ async function validateById(req, res, next) {
 async function validateBody(req, res, next) {
   const { project_id, description, notes } = req.body;
   const projectId = await Projects.get();
-  const check = projectId.some((project) => project.id === project_id);
+  const checkExistingId = projectId.some(
+    (project) => project.id === project_id
+  );
   if (!project_id || !description || !notes) {
     res.status(400).json({ message: "please provide all required fields!" });
-  } else if (!check) {
+  } else if (!checkExistingId) {
     res.status(404).json({ message: `project ${project_id} does not exist` });
   } else {
     next();

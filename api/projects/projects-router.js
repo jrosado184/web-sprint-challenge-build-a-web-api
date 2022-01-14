@@ -32,13 +32,14 @@ router.post("/", validateBody, (req, res, next) => {
     });
 });
 
-router.put("/:id", validateById, validateBody, async (req, res, next) => {
-  try {
-    const update = await Projects.update(req.params.id, req.body);
-    res.json(update);
-  } catch (error) {
-    next(error);
-  }
+router.put("/:id", validateById, validateBody, (req, res, next) => {
+  Projects.update(req.params.id, req.body)
+    .then((project) => {
+      res.json(project);
+    })
+    .catch((error) => {
+      next(error);
+    });
 });
 
 router.delete("/:id", validateById, async (req, res, next) => {

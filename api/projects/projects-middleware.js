@@ -16,14 +16,16 @@ async function validateById(req, res, next) {
   }
 }
 
-async function validateBody(req, res, next) {
-  const { name, description } = req.body;
+function validateBody(req, res, next) {
+  const { name, description, completed } = req.body;
   if (!name || !description) {
-    return res
-      .status(400)
-      .json({ message: "please fill in the required fields!" });
+    res.status(400).json({ message: "please fill in the required fields!" });
+  } else if (!completed) {
+    res.status(400);
+    next();
+  } else {
+    next();
   }
-  next();
 }
 
 module.exports = {
