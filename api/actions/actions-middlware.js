@@ -1,6 +1,7 @@
 // add middlewares here related to actions
 
 const Action = require("./actions-model");
+const Projects = require("../projects/projects-model");
 
 async function validateById(req, res, next) {
   const actionId = await Action.get(req.params.id);
@@ -17,6 +18,20 @@ async function validateById(req, res, next) {
   }
 }
 
+async function validateBody(req, res, next) {
+  const { project_id, description, notes } = req.body;
+  const projectId = await Projects.get();
+  const check = projectId.some((project) => project.id === project_id);
+  if (!project_id || !description || !notes) {
+    res.status(400).json({ message: "please provide all required fields!" });
+  } else if (!check) {
+    res.status(404).json({ message: `project ${project_id} does not exist` });
+  } else {
+    next();
+  }
+}
+
 module.exports = {
   validateById,
+  validateBody,
 };

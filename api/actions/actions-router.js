@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const Action = require("./actions-model");
-const { validateById } = require("./actions-middlware");
+const { validateById, validateBody } = require("./actions-middlware");
 
 router.get("/", (req, res, next) => {
   Action.get()
@@ -18,7 +18,14 @@ router.get("/:id", validateById, (req, res, next) => {
     })
     .catch(next);
 });
-router.post("/", (req, res) => {});
+
+router.post("/", validateBody, (req, res, next) => {
+  Action.insert(req.body)
+    .then((action) => {
+      res.json(action);
+    })
+    .catch(next);
+});
 router.put("/", (req, res) => {});
 router.delete("/", (req, res) => {});
 
