@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const Action = require("./actions-model");
-const { validateById, validateBody } = require("./actions-middlware");
+const { validateById, validateBody } = require("./actions-middleware");
 
 router.get("/", (req, res, next) => {
   Action.get()
