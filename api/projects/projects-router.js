@@ -1,31 +1,28 @@
 // Write your "projects" router here!
 const Projects = require("./projects-model");
+const { validateById } = require("./projects-middleware");
 const express = require("express");
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   try {
     const projects = await Projects.get();
     res.json(projects);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", validateById, async (req, res, next) => {
   try {
     const projects = await Projects.get(req.params.id);
-    if (!projects) {
-      res.status(404).json({ message: "no project with that id exists" });
-    } else {
-      res.json(projects);
-    }
+    res.json(projects);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
-router.post("/", (req, res) => {
+router.post("/", (req, res, next) => {
   const { name, description } = req.body;
   if (!name || !description) {
     res.status(400).json({ message: "fill out all required fields" });
@@ -35,52 +32,46 @@ router.post("/", (req, res) => {
         res.json(project);
       })
       .catch((error) => {
-        res.json(error.message);
+        next(error);
       });
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", validateById, async (req, res, next) => {
   try {
-    const { name, description, completed } = req.body;
-    const project = await Projects.get(req.params.id);
+    const { name, description } = req.body;
     const update = await Projects.update(req.params.id, req.body);
-    if (!project) {
-      res.status(404).json({ message: "id not found" });
-    } else if (!name || !description) {
+    if (!name || !description) {
       res.status(400).json({ message: "fill out all required fields" });
     } else {
       res.json(update);
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", validateById, async (req, res, next) => {
   try {
-    const id = await Projects.get(req.params.id);
     const removeProject = await Projects.remove(req.params.id);
-    if (!id) {
-      res.status(404).json("hey");
-    } else {
-      res.json(removeProject);
-    }
-  } catch (error) {}
+    res.json(removeProject);
+  } catch (error) {
+    next(error);
+  }
 });
-router.get("/:id/actions", async (req, res) => {
+router.get("/:id/actions", validateById, async (req, res, next) => {
   try {
-    const action = await Projects.get(req.params.id);
-    if (!action) {
-      res.status(404).json({ message: "id does not exist" });
-    } else {
-      res.json(action);
-    }
-  } catch {}
+    const action = await Projects.getProjectActions(req.params.id);
+    res.json(action);
+  } catch (error) {
+    next(error);
+  }
 });
-router.get("/", (req, res) => {});
-router.get("/", (req, res) => {});
-router.post("/", (req, res) => {});
-router.put("/", (req, res) => {});
-router.delete("/", (req, res) => {});
+
+router.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    message: err.message,
+    custom: "something went wrong on the projects router",
+  });
+});
 module.exports = router;
