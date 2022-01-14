@@ -42,9 +42,9 @@ router.post("/", (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, completed } = req.body;
     const project = await Projects.get(req.params.id);
-    const update = await Projects.update(req.params.id, { name, description });
+    const update = await Projects.update(req.params.id, req.body);
     if (!project) {
       res.status(404).json({ message: "id not found" });
     } else if (!name || !description) {
@@ -56,6 +56,7 @@ router.put("/:id", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 router.delete("/:id", async (req, res) => {
   try {
     const id = await Projects.get(req.params.id);
