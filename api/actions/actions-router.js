@@ -2,6 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const Action = require("./actions-model");
+const { validateById } = require("./actions-middlware");
 
 router.get("/", (req, res, next) => {
   Action.get()
@@ -10,9 +11,23 @@ router.get("/", (req, res, next) => {
     })
     .catch(next);
 });
-router.get("/", (req, res) => {});
+router.get("/:id", validateById, (req, res, next) => {
+  Action.get(req.params.id)
+    .then((action) => {
+      res.json(action);
+    })
+    .catch(next);
+});
 router.post("/", (req, res) => {});
 router.put("/", (req, res) => {});
 router.delete("/", (req, res) => {});
+
+router.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    message: err.message,
+    custom: "an error occurred in the actions router",
+    stack: err.stack,
+  });
+});
 
 module.exports = router;

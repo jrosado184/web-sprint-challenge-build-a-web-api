@@ -62,6 +62,7 @@ router.use((err, req, res, next) => {
   res.status(err.status || 500).json({
     message: err.message,
     custom: "something went wrong on the projects router",
+    status: err.status,
   });
 });
 module.exports = router;
