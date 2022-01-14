@@ -40,4 +40,37 @@ router.post("/", (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    const project = await Projects.get(req.params.id);
+    const update = await Projects.update(req.params.id, { name, description });
+    if (!project) {
+      res.status(404).json({ message: "id not found" });
+    } else if (!name || !description) {
+      res.status(400).json({ message: "fill out all required fields" });
+    } else {
+      res.json(update);
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+router.delete("/:id", async (req, res) => {
+  try {
+    const id = await Projects.get(req.params.id);
+    const removeProject = await Projects.remove(req.params.id);
+    if (!id) {
+      res.status(404).json("hey");
+    } else {
+      res.json(removeProject);
+    }
+  } catch (error) {}
+});
+router.get("/", (req, res) => {});
+router.get("/", (req, res) => {});
+router.get("/", (req, res) => {});
+router.post("/", (req, res) => {});
+router.put("/", (req, res) => {});
+router.delete("/", (req, res) => {});
 module.exports = router;
